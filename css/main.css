@@ -5,12 +5,25 @@ body {
 
 h1 {
     position: relative;
-    /* margin: auto */
+}
+
+.llama-container {
+    height: 130px;
+    vertical-align: middle;
+}
+
+.llama {
+    width: 80px;
+}
+
+.happy {
+    width: 135.6px;
 }
 
 .board {
     border-style: solid;
     position: relative;
+    z-index: 1;
     margin: auto;
     /* border-collapse: collapse; */
     user-select: none;
@@ -38,7 +51,6 @@ td {
     margin: 15px;
     width: 40px;
     height: 40px;
-    /* padding: 5px 0 5px 0; */
     border-radius: 5px;
     border-style: none;
     background-color: lightskyblue;
@@ -47,17 +59,17 @@ td {
 }
 
 .modal {
-    position: relative;
-    margin: auto;
-    bottom: 200px;
-    background-color: azure;
-    width: fit-content;
+    position: absolute;
+    z-index: 2;
+    left: 37%;
+    top: 30%;
+    background-color: rgba(240, 255, 255, 0.8);
+    width: 20%;
     padding: 30px;
     border-radius: 8px;
     outline-style: solid;
-    outline-color:navy;
+    outline-color: navy;
     display: grid;
-    /* line-height: 300%; */
     font-size: 20px;
     font-weight: 600;
 }
@@ -65,7 +77,6 @@ td {
 .hide {
     display: none;
 }
-
 
 .modal button {
     margin: 20px;
@@ -75,4 +86,24 @@ td {
     background-color: lightskyblue;
     font-size: 20px;
     font-weight: 550;
+}
+
+h3>span {
+    margin-inline: 30px;
+}
+
+button {
+    cursor: pointer;
+}
+
+.pressed-hint {
+    text-shadow: -1px 0 orangered, 0 1px orangered, 1px 0 orangered, 0 -1px orangered;
+}
+
+.hints {
+    text-align: left;
+}
+
+.hidden {
+    visibility: hidden;
 }

@@ -1,3 +1,5 @@
+'use strict'
+
 function countNegs(board, rowIdx, colIdx) {
     var count = 0
 
@@ -34,18 +36,18 @@ function playAudio(audioFileName) {
     sound.play()
 }
 
-function getEmptyCells(board) {
+function getEmptyCells(board, excludeLocation = { i: -1, j: -1 }) {
     var emptyCells = []
     for (var i = 0; i < board.length; i++) {
         for (var j = 0; j < board[0].length; j++) {
-            if (!board[i][j].isMine) emptyCells.push({ i, j })
+            if (!board[i][j].isMine && (i !== excludeLocation.i || j !== excludeLocation.j)) emptyCells.push({ i, j })
         }
     }
     return emptyCells
 }
 
-function getRandomEmptyCell(board) {
-    var emptyCells = getEmptyCells(board)
+function getRandomEmptyCell(board, excludeLocation = { i: -1, j: -1 }) {
+    var emptyCells = getEmptyCells(board, excludeLocation)
     return emptyCells[getRandomIntInclusive(0, emptyCells.length - 1)]
 }
 
