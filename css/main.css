@@ -1,0 +1,78 @@
+body {
+    font-family: 'Segoe UI';
+    text-align: center;
+}
+
+h1 {
+    position: relative;
+    /* margin: auto */
+}
+
+.board {
+    border-style: solid;
+    position: relative;
+    margin: auto;
+    /* border-collapse: collapse; */
+    user-select: none;
+}
+
+td {
+    font-size: x-large;
+    border-style: solid;
+    width: 2em;
+    height: 2em;
+    text-align: center;
+}
+
+.shown {
+    background-color: cornflowerblue;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+}
+
+.levels button {
+    margin: 15px;
+    width: 40px;
+    height: 40px;
+    /* padding: 5px 0 5px 0; */
+    border-radius: 5px;
+    border-style: none;
+    background-color: lightskyblue;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.modal {
+    position: relative;
+    margin: auto;
+    bottom: 200px;
+    background-color: azure;
+    width: fit-content;
+    padding: 30px;
+    border-radius: 8px;
+    outline-style: solid;
+    outline-color:navy;
+    display: grid;
+    /* line-height: 300%; */
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.hide {
+    display: none;
+}
+
+
+.modal button {
+    margin: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    border-style: none;
+    background-color: lightskyblue;
+    font-size: 20px;
+    font-weight: 550;
+}
