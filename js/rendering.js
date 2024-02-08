@@ -1,7 +1,7 @@
 'use strict'
-const LLAMA_IMG = 'img/normal_llama2.png'
+const LLAMA_IMG = 'img/llama.png'
 const HAPPY_LLAMA_IMG = 'img/happy_llama.png'
-const SAD_LLAMA_IMG = 'img/sad_llama2.png'
+const SAD_LLAMA_IMG = 'img/sad_llama.png'
 
 
 function renderBoard() {
@@ -16,7 +16,7 @@ function renderBoard() {
                 if (!cell) cell = ''
                 strClassName = 'shown'
             }
-            strHTML += `<td class="${strClassName}" onClick="onCellClicked(this, ${i}, ${j})" oncontextmenu="onCellMarked(event, this, ${i}, ${j})"><span class='cell-${i}-${j}'>${cell}</span></td>`
+            strHTML += `<td class="${strClassName} cell-${i}-${j}" onClick="onCellClicked(this, ${i}, ${j})" oncontextmenu="onCellMarked(event, this, ${i}, ${j})"><span>${cell}</span></td>`
         }
         strHTML += '</tr>'
     }
@@ -50,6 +50,18 @@ function renderLives() {
         strHTML += `<span>${currLife}</span>`
     }
     document.querySelector('.lives').innerHTML = strHTML
+}
+
+function renderMinesLeft() {
+    var minesLeft = (gLevel.MINES - (gMaxLives - gGame.lives) - gGame.markedCount)
+    if (minesLeft < 0) {
+        minesLeft = -minesLeft
+        document.querySelector('.minus').classList.remove('hidden')
+    }
+    else document.querySelector('.minus').classList.add('hidden')
+
+    minesLeft = (minesLeft + '').padStart(2, '0')
+    document.querySelector('.mines-left').innerText = `${minesLeft} 💣`
 }
 
 function renderHintIcons() {

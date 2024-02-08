@@ -21,8 +21,8 @@ function negsLoop(func, board, rowIdx, colIdx) {
         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
             if (i === rowIdx && j === colIdx) continue
             if (j < 0 || j >= board[0].length) continue
-            var currCell = board[i][j]
-            func(currCell)
+            // var currCell = board[i][j]
+            func({ i, j })
         }
     }
 }

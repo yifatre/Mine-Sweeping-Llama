@@ -5,19 +5,15 @@ body {
 
 h1 {
     position: relative;
+    margin-bottom: 5px;
 }
 
 .llama-container {
-    height: 130px;
-    vertical-align: middle;
+    margin:5px;
 }
 
 .llama {
-    width: 80px;
-}
-
-.happy {
-    width: 135.6px;
+    width: 120px;
 }
 
 .board {
@@ -32,13 +28,14 @@ h1 {
 td {
     font-size: x-large;
     border-style: solid;
-    width: 2em;
-    height: 2em;
+    width: 1.5em;
+    height: 1.5em;
     text-align: center;
+    background-color: rgba(250, 235, 215, 0.532);
 }
 
 .shown {
-    background-color: cornflowerblue;
+    background-color: rgba(100, 148, 237, 0.485);
 }
 
 .footer {
@@ -89,7 +86,7 @@ td {
 }
 
 h3>span {
-    margin-inline: 30px;
+    margin-inline: 20px;
 }
 
 button {
@@ -100,10 +97,42 @@ button {
     text-shadow: -1px 0 orangered, 0 1px orangered, 1px 0 orangered, 0 -1px orangered;
 }
 
+.exploded {
+    text-shadow: 0 0 20px orangered
+}
+
 .hints {
     text-align: left;
 }
 
 .hidden {
     visibility: hidden;
+}
+
+.minus{
+    width: 1em;
+    padding-right: 0;
+    margin-right: 0;
+    text-align: right;
+}
+
+.mines-left{
+    text-align: left;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+.win{
+    background-image: url("../img/confetti.gif");
+}
+
+.lose{
+    background-image: url("../img/explosion.gif");
+    background-size:contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.hinted{
+    background-color: rgb(254, 239, 177);
 }
