@@ -121,7 +121,12 @@ function onCellClicked(elCell, i, j) {
             renderTimer()
         }, 1000)
     }
+
     if (!gGame.isOn) return
+
+    const boardCell = gBoard[i][j]
+    if (boardCell.isMarked) return
+    if (boardCell.isShown) return
 
     if (gIsHint) {
         revealCell({ i, j })
@@ -129,10 +134,6 @@ function onCellClicked(elCell, i, j) {
         gIsHint = false
         return
     }
-
-    const boardCell = gBoard[i][j]
-    if (boardCell.isMarked) return
-    if (boardCell.isShown) return
 
     if (boardCell.minesAroundCount === 0 && !boardCell.isMine) {
         expandShownRec(gBoard, { i, j })
