@@ -2,7 +2,6 @@
 
 function countNegs(board, rowIdx, colIdx) {
     var count = 0
-
     for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
         if (i < 0 || i >= board.length) continue
         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
@@ -21,7 +20,6 @@ function negsLoop(func, board, rowIdx, colIdx) {
         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
             if (i === rowIdx && j === colIdx) continue
             if (j < 0 || j >= board[0].length) continue
-            // var currCell = board[i][j]
             func({ i, j })
         }
     }
@@ -37,18 +35,21 @@ function playAudio(audioFileName) {
 }
 
 function getEmptyCells(board, excludeLocation = { i: -1, j: -1 }) {
-    var emptyCells = []
+    var emptyCellsLocations = []
     for (var i = 0; i < board.length; i++) {
         for (var j = 0; j < board[0].length; j++) {
-            if (!board[i][j].isMine && (i !== excludeLocation.i || j !== excludeLocation.j)) emptyCells.push({ i, j })
+            if (!board[i][j].isMine && !board[i][j].isShown && (i !== excludeLocation.i || j !== excludeLocation.j)) emptyCellsLocations.push({ i, j })
         }
     }
-    return emptyCells
+    return emptyCellsLocations
 }
 
-function getRandomEmptyCell(board, excludeLocation = { i: -1, j: -1 }) {
-    var emptyCells = getEmptyCells(board, excludeLocation)
-    return emptyCells[getRandomIntInclusive(0, emptyCells.length - 1)]
+function getRandomCellsLocations(cells, numOfRandCells = 1) {
+    const randomCells = []
+    for (var i = 0; i < numOfRandCells; i++) {
+        randomCells.push(cells.splice(getRandomIntInclusive(0, cells.length - 1), 1)[0])
+    }
+    return randomCells
 }
 
 function openModal() {

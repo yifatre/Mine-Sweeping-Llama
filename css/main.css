@@ -1,6 +1,8 @@
 body {
     font-family: 'Segoe UI';
     text-align: center;
+    background-color: rgb(255, 246, 250);
+    color: rgb(36, 36, 36);
 }
 
 h1 {
@@ -9,15 +11,16 @@ h1 {
 }
 
 .llama-container {
-    margin:5px;
+    margin: 5px;
 }
 
 .llama {
     width: 120px;
+    filter: drop-shadow(0px 0px 5px rgb(100, 100, 100));
 }
 
 .board {
-    border-style: solid;
+    border-style: none;
     position: relative;
     z-index: 1;
     margin: auto;
@@ -28,20 +31,23 @@ h1 {
 td {
     font-size: x-large;
     border-style: solid;
+    border-color: darkslategrey;
+    border-radius: 4px;
     width: 1.5em;
     height: 1.5em;
     text-align: center;
-    background-color: rgba(250, 235, 215, 0.532);
+    background-color: rgba(255, 243, 226, 0.5);
 }
 
-.shown {
+.shown,
+.shown.dark {
     background-color: rgba(100, 148, 237, 0.485);
 }
 
 .footer {
     position: fixed;
-    bottom: 0px;
-    right: 0px;
+    bottom: 3px;
+    right: 3px;
 }
 
 .levels button {
@@ -50,9 +56,20 @@ td {
     height: 40px;
     border-radius: 5px;
     border-style: none;
-    background-color: lightskyblue;
+
     font-size: 20px;
     font-weight: 600;
+}
+
+.dark-mode-btn {
+    margin: 15px;
+    padding-inline: 15px;
+    height: 40px;
+    border-radius: 5px;
+    border-style: none;
+
+    font-size: 17px;
+    font-weight: 550;
 }
 
 .modal {
@@ -80,7 +97,7 @@ td {
     padding: 10px;
     border-radius: 5px;
     border-style: none;
-    background-color: lightskyblue;
+    color: rgb(36, 36, 36);
     font-size: 20px;
     font-weight: 550;
 }
@@ -91,6 +108,9 @@ h3>span {
 
 button {
     cursor: pointer;
+    background-color: lightskyblue;
+    color: rgb(36, 36, 36);
+
 }
 
 .pressed-hint {
@@ -109,30 +129,86 @@ button {
     visibility: hidden;
 }
 
-.minus{
+.minus {
     width: 1em;
     padding-right: 0;
     margin-right: 0;
     text-align: right;
 }
 
-.mines-left{
+.mines-left {
     text-align: left;
+    padding-inline: 0;
+    margin-inline: 0;
+}
+
+span.mine {
     padding-left: 0;
-    margin-left: 0;
+    margin-left: 0.5em;
 }
 
-.win{
-    background-image: url("../img/confetti.gif");
+.win {
+    background-image: url("../img/clear_confetti.gif");
 }
 
-.lose{
+.lose {
     background-image: url("../img/explosion.gif");
-    background-size:contain;
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
 }
 
-.hinted{
+.hinted {
     background-color: rgb(254, 239, 177);
+}
+
+.safe-cell {
+    background-color: rgb(187, 255, 145);
+}
+
+body.dark {
+    background-color: rgb(23, 21, 22);
+    color: rgb(169, 179, 179);
+
+}
+
+button.dark {
+    background-color: rgb(49, 89, 114);
+    color: rgb(216, 231, 231);
+    font-weight: 500;
+}
+
+.modal.dark {
+    background-color: rgba(65, 84, 84, 0.8);
+    color: rgb(216, 231, 231);
+}
+
+td.dark {
+    color: rgb(216, 231, 231);
+    border-color: rgb(122, 185, 185);
+    background-color: rgba(36, 36, 64, 0.5);
+}
+
+.llama.dark {
+    filter: drop-shadow(0px 0px 10px rgb(161, 161, 161));
+}
+
+.terminator {
+    vertical-align: middle;
+}
+
+.terminator img {
+    height: 2.5em;
+    filter: drop-shadow(0px 0px 3px rgba(255, 0, 0, 0.495));
+}
+
+.used {
+    opacity: 30%;
+    filter: none
+}
+
+.mine,
+.safes.dark,
+.hints.dark {
+    text-shadow: -1px 0 rgba(255, 255, 255, 0.6), 0 1px rgba(255, 255, 255, 0.6), 1px 0 rgba(255, 255, 255, 0.6), 0 -1px rgba(255, 255, 255, 0.6);
 }

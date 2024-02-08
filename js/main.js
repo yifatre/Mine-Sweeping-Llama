@@ -1,30 +1,56 @@
 'use strict'
 
 const MINE = '💣'
+const EXPLODED_MINE = '💥'
 const FLAG = '🚩'
 const LIFE_ON = '💖'
 const LIFE_OFF = '🤍'
+const LIFE_OFF_DARK = '🖤'
 const HINT = '💡'
+const SAFE = '🛡️'
 
 const gLevels = [{ SIZE: 4, MINES: 2 }, { SIZE: 8, MINES: 14 }, { SIZE: 12, MINES: 32 }]
-var gLevel = gLevels[0]
+
 const gGame = {}
+gGame.level = gLevels[0]
+
 const gMaxLives = 3
 const gMaxHints = 3
+const gMaxSafes = 3
+
+/*
+gGame = {
+    gGame.isOn = true
+    gGame.shownCount = 0
+    gGame.markedCount = 0
+    gGame.secsPassed = 0
+    gGame.lives = gMaxLives
+    gGame.hints = gMaxHints
+    gGame.safes = gMaxSafes
+    gGame.level = gLevels[0]
+
+}
+
+*/
 
 var gBoard = []
 var gGameInterval
 var gGameStartTime
 var gIsHint = false
-
+var gDeletedMinesCount
 
 function onInit() {
     renderLevelButtons()
+    startGame()
+}
+
+function startGame() {
+    resetGame()
     gBoard = buildBoard()
     renderBoard()
-    resetGame()
     renderLives()
     renderHintIcons()
+    renderSafeIcons()
     renderMinesLeft()
     printBoard()
     closeModal()
@@ -42,15 +68,19 @@ function resetGame() {
     gGame.secsPassed = 0
     gGame.lives = gMaxLives
     gGame.hints = gMaxHints
+    gGame.safes = gMaxSafes
+
+    if (gDeletedMinesCount) document.querySelector('.used').classList.remove('used')
+    gDeletedMinesCount = 0
     renderTimer()
     renderLlama(LLAMA_IMG)
 }
 
 function buildBoard() {
     const board = []
-    for (var i = 0; i < gLevel.SIZE; i++) {
+    for (var i = 0; i < gGame.level.SIZE; i++) {
         board[i] = []
-        for (var j = 0; j < gLevel.SIZE; j++) {
+        for (var j = 0; j < gGame.level.SIZE; j++) {
             board[i][j] = {
                 minesAroundCount: 0,
                 isShown: false,
@@ -63,8 +93,8 @@ function buildBoard() {
 }
 
 function setMinesNegsCount(board) {
-    for (var i = 0; i < gLevel.SIZE; i++) {
-        for (var j = 0; j < gLevel.SIZE; j++) {
+    for (var i = 0; i < gGame.level.SIZE; i++) {
+        for (var j = 0; j < gGame.level.SIZE; j++) {
             const minesCount = countNegs(board, i, j)
             board[i][j].minesAroundCount = minesCount
         }
@@ -101,7 +131,6 @@ function onCellClicked(elCell, i, j) {
     }
     else gGame.shownCount++
 
-
     boardCell.isShown = true
     elCell.classList.add('shown')
     if (boardCell.isMine) {
@@ -118,25 +147,15 @@ function onCellClicked(elCell, i, j) {
             clearInterval(gGameInterval)
             document.querySelector('.msg').innerText = 'You Lose :('
             setTimeout(openModal, 100)
-            return
         }
     }
-
-
-    const cellValue = boardCell.isMine ? MINE : boardCell.minesAroundCount
+    const cellValue = boardCell.isMine ? EXPLODED_MINE : boardCell.minesAroundCount
     renderCell({ i, j }, cellValue)
-    if (checkGameOver()) {
-        renderLlama(HAPPY_LLAMA_IMG)
-        document.body.classList.add('win')
-        playAudio('twinkles.mp3')
-        gGame.isOn = false
-        clearInterval(gGameInterval)
-        document.querySelector('.msg').innerText = 'You Win!'
-        setTimeout(openModal, 100)
-    }
+
+    if (checkGameOver()) onWin()
 }
 
-function onCellMarked(event, elCell, i, j) {
+function onCellMarked(event, i, j) {
     event.preventDefault()
     if (!gGame.isOn) return
     const boardCell = gBoard[i][j]
@@ -153,25 +172,26 @@ function onCellMarked(event, elCell, i, j) {
     renderBoard()
     renderMinesLeft()
 
-    if (checkGameOver()) gGame.isOn = false
+    if (checkGameOver()) onWin()
 
     // printMarksBoard()
 }
 
 function checkGameOver() {
     const livesUsed = gMaxLives - gGame.lives
-    return (gGame.markedCount + livesUsed === gLevel.MINES &&
-        gLevel.SIZE ** 2 === gGame.shownCount + gGame.markedCount)
+    return (gGame.markedCount + livesUsed === gGame.level.MINES - gDeletedMinesCount &&
+        gGame.level.SIZE ** 2 === gGame.shownCount + gGame.markedCount)
 }
 
-// function expandShown(board, elCell, i, j) {
-//     negsLoop((cell) => {
-//         if (cell.isShown || cell.isMarked) return
-//         cell.isShown = true
-//         gGame.shownCount++
-//     }, gBoard, i, j)
-//     renderBoard()
-// }
+function onWin() {
+    renderLlama(HAPPY_LLAMA_IMG)
+    document.body.classList.add('win')
+    playAudio('twinkles.mp3')
+    gGame.isOn = false
+    clearInterval(gGameInterval)
+    document.querySelector('.msg').innerText = 'You Win!'
+    setTimeout(openModal, 100)
+}
 
 function expandShownRec(board, location) {
     if (board[location.i][location.j].isMarked) return
@@ -196,24 +216,25 @@ function expandShownRec(board, location) {
 }
 
 function addMines(board, excludeLocation) {
-    for (var i = 0; i < gLevel.MINES; i++) {
-        const randLocation = getRandomEmptyCell(board, excludeLocation)
+    for (var i = 0; i < gGame.level.MINES; i++) {
+        const emptyCells = getEmptyCells(board, excludeLocation)
+        const randLocation = getRandomCellsLocations(emptyCells, 1)[0]
         const cell = board[randLocation.i][randLocation.j]
         cell.isMine = true
     }
 }
 
 function showMines() {
-    for (var i = 0; i < gLevel.SIZE; i++) {
-        for (var j = 0; j < gLevel.SIZE; j++) {
-            if (gBoard[i][j].isMine) renderCell({ i, j }, MINE)
+    for (var i = 0; i < gGame.level.SIZE; i++) {
+        for (var j = 0; j < gGame.level.SIZE; j++) {
+            if (gBoard[i][j].isMine && !gBoard[i][j].isShown) renderCell({ i, j }, MINE)
         }
     }
 }
 
 function changeLevel(i) {
-    gLevel = gLevels[i]
-    onInit()
+    gGame.level = gLevels[i]
+    startGame()
 }
 
 function onHintClicked(elSpan) {
@@ -229,6 +250,19 @@ function onHintClicked(elSpan) {
     elSpan.classList.add('pressed-hint')
 }
 
+function onSafeClicked(elSpan) {
+    if (!gGameStartTime) return
+    const cells = getEmptyCells(gBoard)
+    const safeCells = getRandomCellsLocations(cells, gMaxSafes)
+    for (var i = 0; i < safeCells.length; i++) {
+        const cell = document.querySelector(`.cell-${safeCells[i].i}-${safeCells[i].j}`)
+        cell.classList.add('safe-cell')
+        setTimeout(() => cell.classList.remove('safe-cell'), 2000)
+    }
+    gGame.safes--
+    elSpan.classList.add('hidden')
+}
+
 function revealCell(location) {
     const cell = gBoard[location.i][location.j]
     if (!cell.isShown) {
@@ -241,9 +275,30 @@ function revealCell(location) {
             cell.isShown = false
             document.querySelector(`.cell-${location.i}-${location.j}`).classList.remove('hinted')
             renderBoard()
-            renderHintIcons()
+            document.querySelector('.pressed-hint').classList.add('hidden')
         }, 1000)
     }
+}
+
+function mineExterminatorClicked(elSpan) {
+    if (!gGameStartTime) return
+    if (gDeletedMinesCount) return
+    const minesLocations = []
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[0].length; j++) {
+            if (gBoard[i][j].isMine && !gBoard[i][j].isShown) minesLocations.push({ i, j })
+        }
+    }
+    const minesToDelete = getRandomCellsLocations(minesLocations, Math.min(3, minesLocations.length))
+    for (var i = 0; i < minesToDelete.length; i++) {
+        const location = minesToDelete[i]
+        gBoard[location.i][location.j].isMine = false
+        gDeletedMinesCount++
+    }
+    setMinesNegsCount(gBoard)
+    renderBoard()
+    renderMinesLeft()
+    elSpan.classList.add('used')
 }
 
 
@@ -269,9 +324,9 @@ function revealCell(location) {
 //* for work
 function printBoard() {
     const board = []
-    for (var i = 0; i < gLevel.SIZE; i++) {
+    for (var i = 0; i < gGame.level.SIZE; i++) {
         board[i] = []
-        for (var j = 0; j < gLevel.SIZE; j++) {
+        for (var j = 0; j < gGame.level.SIZE; j++) {
             board[i][j] = gBoard[i][j].isMine ? MINE : gBoard[i][j].minesAroundCount
         }
     }
@@ -279,9 +334,9 @@ function printBoard() {
 }
 function printMarksBoard() {
     const board = []
-    for (var i = 0; i < gLevel.SIZE; i++) {
+    for (var i = 0; i < gGame.level.SIZE; i++) {
         board[i] = []
-        for (var j = 0; j < gLevel.SIZE; j++) {
+        for (var j = 0; j < gGame.level.SIZE; j++) {
             board[i][j] = gBoard[i][j].isMarked ? FLAG : ''
         }
     }
