@@ -13,6 +13,7 @@
     <h1>Mine Sweeping Llama</h1>
     <div class="modal hide"><span class="msg"></span><button onclick="startGame()">Play Again</button></div>
     <h1 class="llama-container">
+        <button class="undo-btn" onclick="undo()"><img src="img/undo.png" class="undo-btn"/></button>
         <img class="llama" onclick="startGame()" src="img/llama.png" />
     </h1>
     </h1>
@@ -27,6 +28,7 @@
         <span class="minus hidden">-</span>
         <span class="mines-left">00</span><span class="mine">💣</span>
     </h3>
+    
     <table class="board"></table>
     <div class="best-score">Best time for level <span class="level"></span> is <span class="best-time"></span></div>
     <div class="levels"></div>
@@ -38,5 +40,4 @@
         <script src="js/rendering.js"></script>
         <script src="js/main.js"></script>
 </body>
-
 </html>

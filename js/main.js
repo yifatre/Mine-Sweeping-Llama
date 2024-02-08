@@ -22,21 +22,6 @@ const gMaxLives = 3
 const gMaxHints = 3
 const gMaxSafes = 3
 
-/*
-gGame = {
-    gGame.isOn = true
-    gGame.shownCount = 0
-    gGame.markedCount = 0
-    gGame.secsPassed = 0
-    gGame.lives = gMaxLives
-    gGame.hints = gMaxHints
-    gGame.safes = gMaxSafes
-    gGame.level = gLevels[0]
-
-}
-
-*/
-
 var gBoard = []
 var gGameInterval
 
@@ -60,7 +45,6 @@ function startGame() {
     renderMinesLeft()
     renderBestTime()
     renderCreateDivs()
-    // printBoard()//*********************************************** */
     closeModal()
     clearInterval(gGameInterval)
     gIsHint = false
@@ -77,6 +61,7 @@ function resetGame() {
     gGame.hints = gMaxHints
     gGame.safes = gMaxSafes
     gGame.startTime = null
+    gGame.moves = []
 
     if (gDeletedMinesCount) document.querySelector('.used').classList.remove('used')
     gDeletedMinesCount = 0
@@ -113,7 +98,6 @@ function onCellClicked(elCell, i, j) {
     if (gIsCreateMode) {
         gBoard[i][j].isMine = true
         renderCell({ i, j }, MINE)
-        printBoard()
         gMinesPositioned++
         const elSpan = document.querySelector('span.create')
         elSpan.innerText = `${gGame.level.MINES - gMinesPositioned}`
@@ -136,7 +120,6 @@ function onCellClicked(elCell, i, j) {
             gGame.secsPassed = Math.floor((Date.now() - gGame.startTime) / 1000)
             renderTimer()
         }, 1000)
-        // printBoard() //************************************************************************************************* */
     }
     if (!gGame.isOn) return
 
@@ -151,14 +134,15 @@ function onCellClicked(elCell, i, j) {
     if (boardCell.isMarked) return
     if (boardCell.isShown) return
 
-
     if (boardCell.minesAroundCount === 0 && !boardCell.isMine) {
         expandShownRec(gBoard, { i, j })
     }
-    else gGame.shownCount++
+    else {
+        gGame.moves.push({ i, j })
+        gGame.shownCount++
+    }
 
     boardCell.isShown = true
-    elCell.classList.add('shown')
     if (boardCell.isMine) {
         gGame.lives--
         renderLives()
@@ -198,7 +182,6 @@ function onCellMarked(event, i, j) {
     }
     renderMinesLeft()
     if (checkGameOver()) onWin()
-    // printMarksBoard()
 }
 
 function checkGameOver() {
@@ -227,8 +210,8 @@ function expandShownRec(board, location) {
         gGame.shownCount++
         board[location.i][location.j].isShown = true
     }
-    document.querySelector(`.cell-${location.i}-${location.j}`).classList.add('shown')
     renderCell(location, board[location.i][location.j].minesAroundCount)
+    gGame.moves.push(location)
     if (!board[location.i][location.j].minesAroundCount) {
         for (var i = location.i - 1; i <= location.i + 1; i++) {
             if (i < 0 || i >= board.length) continue
@@ -290,13 +273,11 @@ function onSafeClicked(elSpan) {
 function revealCell(location) {
     const cell = gBoard[location.i][location.j]
     if (!cell.isShown) {
-        cell.isShown = true
         document.querySelector(`.cell-${location.i}-${location.j}`).classList.add('hinted')
         const val = cell.isMine ? MINE : cell.minesAroundCount
         renderCell(location, val)
 
         setTimeout(() => {
-            cell.isShown = false
             document.querySelector(`.cell-${location.i}-${location.j}`).classList.remove('hinted')
             renderBoard()
             document.querySelector('.pressed-hint').classList.add('hidden')
@@ -341,6 +322,7 @@ function onCreateBtnClicked(elBtn) {
         elBtn.innerText = 'Create your own board'
         return
     }
+    startGame()
     gIsCreateMode = true
     gMinesPositioned = 0
     elBtn.innerText = 'Cancel'
@@ -348,48 +330,11 @@ function onCreateBtnClicked(elBtn) {
     document.querySelector('div.create').classList.remove('hidden')
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//* for work
-function printBoard() {
-    const board = []
-    for (var i = 0; i < gGame.level.SIZE; i++) {
-        board[i] = []
-        for (var j = 0; j < gGame.level.SIZE; j++) {
-            board[i][j] = gBoard[i][j].isMine ? MINE : gBoard[i][j].minesAroundCount
-        }
-    }
-    console.table(board)
+function undo() {
+    if(!gGame.moves.length) return
+    const move = gGame.moves.pop()
+    gBoard[move.i][move.j].isShown = false
+    gGame.shownCount--
+    renderCell(move, EMPTY)
 }
-function printMarksBoard() {
-    const board = []
-    for (var i = 0; i < gGame.level.SIZE; i++) {
-        board[i] = []
-        for (var j = 0; j < gGame.level.SIZE; j++) {
-            board[i][j] = gBoard[i][j].isMarked ? FLAG : ''
-        }
-    }
-    console.table(board)
-}
+

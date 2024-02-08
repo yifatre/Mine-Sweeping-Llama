@@ -1,4 +1,5 @@
 'use strict'
+
 const LLAMA_IMG = 'img/llama.png'
 const HAPPY_LLAMA_IMG = 'img/happy_llama.png'
 const SAD_LLAMA_IMG = 'img/sad_llama.png'
@@ -32,6 +33,8 @@ function renderCell(location, value) {
         elCell.classList.add('mine')
     }
     elCell.innerHTML = value
+    if (!gBoard[location.i][location.j].isShown) elCell.classList.remove('shown')
+    else elCell.classList.add('shown')
 }
 
 function renderLevelButtons() {
@@ -99,7 +102,6 @@ function renderLlama(img) {
     im.src = img
     if (img === HAPPY_LLAMA_IMG) im.classList.add('happy')
     else im.classList.remove('happy')
-
 }
 
 function toggleDarkMode(elBtn) {
