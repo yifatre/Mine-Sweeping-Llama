@@ -51,7 +51,7 @@ td {
 }
 
 .levels button {
-    margin: 15px;
+    margin: 10px;
     width: 40px;
     height: 40px;
     border-radius: 5px;
@@ -61,16 +61,6 @@ td {
     font-weight: 600;
 }
 
-.dark-mode-btn {
-    margin: 15px;
-    padding-inline: 15px;
-    height: 40px;
-    border-radius: 5px;
-    border-style: none;
-
-    font-size: 17px;
-    font-weight: 550;
-}
 
 .modal {
     position: absolute;
@@ -211,4 +201,19 @@ td.dark {
 .safes.dark,
 .hints.dark {
     text-shadow: -1px 0 rgba(255, 255, 255, 0.6), 0 1px rgba(255, 255, 255, 0.6), 1px 0 rgba(255, 255, 255, 0.6), 0 -1px rgba(255, 255, 255, 0.6);
+}
+
+.create-btn,
+.dark-mode-btn,
+.create-btn.dark,
+.dark-mode-btn.dark {
+    margin: 5px 5px 0px 5px;
+    padding-inline: 15px;
+    height: 20;
+    border-radius: 5px;
+    border-style: none;
+
+    font-size: 17px;
+    font-weight: 550;
+    background: none;
 }

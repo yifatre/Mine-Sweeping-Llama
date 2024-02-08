@@ -10,11 +10,11 @@ function renderBoard() {
     for (var i = 0; i < gGame.level.SIZE; i++) {
         strHTML += '<tr>'
         for (var j = 0; j < gGame.level.SIZE; j++) {
-            var cell = gBoard[i][j].isMarked ? FLAG : ''
+            var cell = gBoard[i][j].isMarked ? FLAG : EMPTY
             var strClassName = ''
             if (gBoard[i][j].isShown) {
                 cell = gBoard[i][j].isMine ? EXPLODED_MINE : gBoard[i][j].minesAroundCount
-                if (!cell) cell = ''
+                if (!cell) cell = EMPTY
                 strClassName = 'shown'
             }
             if (gIsDarkMode) strClassName += ' dark'
@@ -27,7 +27,7 @@ function renderBoard() {
 
 function renderCell(location, value) {
     const elCell = document.querySelector(`.cell-${location.i}-${location.j}`)
-    if (!value) value = ''
+    if (!value) value = EMPTY
     if (value === MINE) {
         elCell.classList.add('mine')
     }
@@ -42,10 +42,15 @@ function renderLevelButtons() {
     document.querySelector('.levels').innerHTML = strHTML
 }
 
+function getFormattedTime(totalSecs) {
+    const mins = (Math.floor(totalSecs / 60) + '').padStart(2, '0')
+    const secs = (totalSecs % 60 + '').padStart(2, '0')
+    return { mins, secs }
+}
+
 function renderTimer() {
-    const mins = (Math.floor(gGame.secsPassed / 60) + '').padStart(2, '0')
-    const secs = (gGame.secsPassed % 60 + '').padStart(2, '0')
-    document.querySelector('.timer').innerText = `${mins}:${secs}`
+    const timePassed = getFormattedTime(gGame.secsPassed)
+    document.querySelector('.timer').innerText = `${timePassed.mins}:${timePassed.secs}`
 }
 
 function renderLives() {
@@ -115,4 +120,20 @@ function toggleDarkMode(elBtn) {
     }
     renderLives()
     elBtn.innerText = 'Dark Mode'
+}
+
+function renderBestTime() {
+    const storedTime = localStorage.getItem(`bestScoreForLevel${gGame.level.SIZE}`)
+    if (!storedTime) return document.querySelector('.best-score').classList.add('hidden')
+    document.querySelector('.best-score').classList.remove('hidden')
+    const formattedTime = getFormattedTime(+storedTime)
+    document.querySelector('.level').innerText = gGame.level.SIZE
+    document.querySelector('.best-time').innerText = `${formattedTime.mins}:${formattedTime.secs}`
+}
+
+function renderCreateDivs() {
+    const elBtn = document.querySelector('.create-btn')
+    elBtn.innerText = `Create your own board`
+    elBtn.disabled = false
+    document.querySelector('div.create').classList.add('hidden')
 }

@@ -11,7 +11,7 @@
 
 <body class="" onload="onInit()">
     <h1>Mine Sweeping Llama</h1>
-    <div class="modal hide"><span class="msg"></span><button onclick="onInit()">Play Again</button></div>
+    <div class="modal hide"><span class="msg"></span><button onclick="startGame()">Play Again</button></div>
     <h1 class="llama-container">
         <img class="llama" onclick="startGame()" src="img/llama.png" />
     </h1>
@@ -28,7 +28,10 @@
         <span class="mines-left">00</span><span class="mine">💣</span>
     </h3>
     <table class="board"></table>
+    <div class="best-score">Best time for level <span class="level"></span> is <span class="best-time"></span></div>
     <div class="levels"></div>
+    <div><button class="create-btn" onclick="onCreateBtnClicked(this)">Create your own board</button></div>
+    <div class="create hidden">You have <span class="create"></span> mines to position</div>
     <div class=""><button class="dark-mode-btn" onclick="toggleDarkMode(this)">Dark Mode</button></h3>
         <div class="footer">Yifat Regensberg</div>
         <script src="js/utils.js"></script>

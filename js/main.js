@@ -8,11 +8,15 @@ const LIFE_OFF = '🤍'
 const LIFE_OFF_DARK = '🖤'
 const HINT = '💡'
 const SAFE = '🛡️'
+const EMPTY = ''
 
 const gLevels = [{ SIZE: 4, MINES: 2 }, { SIZE: 8, MINES: 14 }, { SIZE: 12, MINES: 32 }]
 
 const gGame = {}
 gGame.level = gLevels[0]
+
+var gIsCreateMode
+var gMinesPositioned
 
 const gMaxLives = 3
 const gMaxHints = 3
@@ -35,7 +39,7 @@ gGame = {
 
 var gBoard = []
 var gGameInterval
-var gGameStartTime
+
 var gIsHint = false
 var gDeletedMinesCount
 
@@ -45,17 +49,20 @@ function onInit() {
 }
 
 function startGame() {
+    gIsCreateMode = false
     resetGame()
     gBoard = buildBoard()
+    gMinesPositioned = 0
     renderBoard()
     renderLives()
     renderHintIcons()
     renderSafeIcons()
     renderMinesLeft()
-    printBoard()
+    renderBestTime()
+    renderCreateDivs()
+    // printBoard()//*********************************************** */
     closeModal()
     clearInterval(gGameInterval)
-    gGameStartTime = null
     gIsHint = false
     document.body.classList.remove('win')
     document.body.classList.remove('lose')
@@ -69,6 +76,7 @@ function resetGame() {
     gGame.lives = gMaxLives
     gGame.hints = gMaxHints
     gGame.safes = gMaxSafes
+    gGame.startTime = null
 
     if (gDeletedMinesCount) document.querySelector('.used').classList.remove('used')
     gDeletedMinesCount = 0
@@ -102,12 +110,30 @@ function setMinesNegsCount(board) {
 }
 
 function onCellClicked(elCell, i, j) {
-    if (!gGameStartTime) {
-        addMines(gBoard, { i, j })
+    if (gIsCreateMode) {
+        gBoard[i][j].isMine = true
+        renderCell({ i, j }, MINE)
+        printBoard()
+        gMinesPositioned++
+        const elSpan = document.querySelector('span.create')
+        elSpan.innerText = `${gGame.level.MINES - gMinesPositioned}`
+        if (gMinesPositioned === gGame.level.MINES) {
+            gIsCreateMode = false
+            const elBtn = document.querySelector('.create-btn')
+            elBtn.innerText = "Start Playing!"
+            elBtn.disabled = true
+            document.querySelector('div.create').classList.add('hidden')
+            renderBoard()
+        }
+        return
+    }
+
+    if (!gGame.startTime) {
+        if (!gMinesPositioned) addMines(gBoard, { i, j })
         setMinesNegsCount(gBoard)
-        gGameStartTime = Date.now()
+        gGame.startTime = Date.now()
         gGameInterval = setInterval(() => {
-            gGame.secsPassed = Math.floor((Date.now() - gGameStartTime) / 1000)
+            gGame.secsPassed = Math.floor((Date.now() - gGame.startTime) / 1000)
             renderTimer()
         }, 1000)
         // printBoard() //************************************************************************************************* */
@@ -163,17 +189,15 @@ function onCellMarked(event, i, j) {
     if (boardCell.isMarked) {
         boardCell.isMarked = false
         gGame.markedCount--
+        renderCell({ i, j }, EMPTY)
     }
     else {
         boardCell.isMarked = true
         gGame.markedCount++
+        renderCell({ i, j }, FLAG)
     }
-
-    renderBoard()
     renderMinesLeft()
-
     if (checkGameOver()) onWin()
-
     // printMarksBoard()
 }
 
@@ -189,6 +213,8 @@ function onWin() {
     playAudio('twinkles.mp3')
     gGame.isOn = false
     clearInterval(gGameInterval)
+    keepBestScore()
+    renderBestTime()
     document.querySelector('.msg').innerText = 'You Win!'
     setTimeout(openModal, 100)
 }
@@ -238,7 +264,7 @@ function changeLevel(i) {
 }
 
 function onHintClicked(elSpan) {
-    if (!gGameStartTime) return
+    if (!gGame.startTime) return
     if (gIsHint) {
         gIsHint = false
         elSpan.innerText = HINT
@@ -251,14 +277,12 @@ function onHintClicked(elSpan) {
 }
 
 function onSafeClicked(elSpan) {
-    if (!gGameStartTime) return
+    if (!gGame.startTime) return
     const cells = getEmptyCells(gBoard)
-    const safeCells = getRandomCellsLocations(cells, gMaxSafes)
-    for (var i = 0; i < safeCells.length; i++) {
-        const cell = document.querySelector(`.cell-${safeCells[i].i}-${safeCells[i].j}`)
-        cell.classList.add('safe-cell')
-        setTimeout(() => cell.classList.remove('safe-cell'), 2000)
-    }
+    const safeCell = getRandomCellsLocations(cells)[0]
+    const cell = document.querySelector(`.cell-${safeCell.i}-${safeCell.j}`)
+    cell.classList.add('safe-cell')
+    setTimeout(() => cell.classList.remove('safe-cell'), 2000)
     gGame.safes--
     elSpan.classList.add('hidden')
 }
@@ -281,7 +305,7 @@ function revealCell(location) {
 }
 
 function mineExterminatorClicked(elSpan) {
-    if (!gGameStartTime) return
+    if (!gGame.startTime) return
     if (gDeletedMinesCount) return
     const minesLocations = []
     for (var i = 0; i < gBoard.length; i++) {
@@ -300,6 +324,33 @@ function mineExterminatorClicked(elSpan) {
     renderMinesLeft()
     elSpan.classList.add('used')
 }
+
+function keepBestScore() {
+    var bestScore = localStorage.getItem(`bestScoreForLevel${gGame.level.SIZE}`)
+    if (!bestScore) localStorage.setItem(`bestScoreForLevel${gGame.level.SIZE}`, gGame.secsPassed)
+    else if (gGame.secsPassed < bestScore) {
+        localStorage.setItem(`bestScoreForLevel${gGame.level.SIZE}`, gGame.secsPassed)
+    }
+}
+
+function onCreateBtnClicked(elBtn) {
+    const elSpan = document.querySelector('span.create')
+    if (gIsCreateMode) {
+        startGame()
+        document.querySelector('div.create').classList.add('hidden')
+        elBtn.innerText = 'Create your own board'
+        return
+    }
+    gIsCreateMode = true
+    gMinesPositioned = 0
+    elBtn.innerText = 'Cancel'
+    elSpan.innerText = `${gGame.level.MINES}`
+    document.querySelector('div.create').classList.remove('hidden')
+}
+
+
+
+
 
 
 
