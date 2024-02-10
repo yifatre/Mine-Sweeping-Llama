@@ -62,7 +62,7 @@ td {
 }
 
 .modal {
-    position: absolute;
+    position: fixed;
     z-index: 2;
     left: calc(50% - 110px);
     top: 30%;
@@ -226,6 +226,16 @@ td.dark {
     background: none;
     border: none;
     height: 30px;
+}
+
+.mega-hint{
+    position: absolute;
+    right: calc(50% - 110px);
+    top: 50px;
+    background: none;
+    border: none;
+    height: 50px;
+    margin: none;
 }
 
 .hinted.dark {

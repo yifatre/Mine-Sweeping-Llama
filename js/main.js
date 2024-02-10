@@ -26,6 +26,8 @@ var gBoard = []
 var gGameInterval
 
 var gIsHint = false
+var gIsMegaHint = false
+var gMegaHintLocations = []
 var gDeletedMinesCount
 
 function onInit() {
@@ -48,6 +50,8 @@ function startGame() {
     closeModal()
     clearInterval(gGameInterval)
     gIsHint = false
+    gIsMegaHint = false
+    gMegaHintLocations = []
     document.body.classList.remove('win')
     document.body.classList.remove('lose')
 }
@@ -64,6 +68,7 @@ function resetGame() {
     gGame.moves = []
 
     if (gDeletedMinesCount) document.querySelector('.used').classList.remove('used')
+    if (gMegaHintLocations.length) document.querySelector('.mega-hint').classList.remove('used')
     gDeletedMinesCount = 0
     renderTimer()
     renderLlama(LLAMA_IMG)
@@ -129,9 +134,15 @@ function onCellClicked(elCell, i, j) {
     if (boardCell.isShown) return
 
     if (gIsHint) {
-        revealCell({ i, j })
+        revealCell({ i, j }, 1000)
         negsLoop(revealCell, gBoard, i, j)
         gIsHint = false
+        return
+    }
+
+    if (gIsMegaHint) {
+        gMegaHintLocations.push({ i, j })
+        if (gMegaHintLocations.length === 2) showMegaHint()
         return
     }
 
@@ -271,21 +282,6 @@ function onSafeClicked(elSpan) {
     elSpan.classList.add('hidden')
 }
 
-function revealCell(location) {
-    const cell = gBoard[location.i][location.j]
-    if (!cell.isShown) {
-        document.querySelector(`.cell-${location.i}-${location.j}`).classList.add('hinted')
-        const val = cell.isMine ? MINE : cell.minesAroundCount
-        renderCell(location, val)
-
-        setTimeout(() => {
-            document.querySelector(`.cell-${location.i}-${location.j}`).classList.remove('hinted')
-            renderBoard()
-            document.querySelector('.pressed-hint').classList.add('hidden')
-        }, 1000)
-    }
-}
-
 function mineExterminatorClicked(elSpan) {
     if (!gGame.startTime) return
     if (gDeletedMinesCount) return
@@ -332,10 +328,16 @@ function onCreateBtnClicked(elBtn) {
 }
 
 function undo() {
-    if(!gGame.moves.length) return
+    if (!gGame.moves.length) return
     const move = gGame.moves.pop()
     gBoard[move.i][move.j].isShown = false
     gGame.shownCount--
     renderCell(move, EMPTY)
 }
 
+function megaHintClicked() {
+    if (!gGame.startTime) return
+    if (gMegaHintLocations.length > 0) return
+    if (gIsMegaHint) return gIsMegaHint = false
+    gIsMegaHint = true
+}

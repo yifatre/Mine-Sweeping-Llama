@@ -139,3 +139,36 @@ function renderCreateDivs() {
     elBtn.disabled = false
     document.querySelector('div.create').classList.add('hidden')
 }
+
+function revealCell(location, duration = 1000) {
+    const cell = gBoard[location.i][location.j]
+    if (!cell.isShown) {
+        document.querySelector(`.cell-${location.i}-${location.j}`).classList.add('hinted')
+        const val = cell.isMine ? MINE : cell.minesAroundCount
+        renderCell(location, val)
+
+        setTimeout(() => {
+            document.querySelector(`.cell-${location.i}-${location.j}`).classList.remove('hinted')
+            renderBoard()
+            const pressedHint = document.querySelector('.pressed-hint')
+            if (pressedHint) pressedHint.classList.add('hidden')
+        }, duration)
+    }
+}
+
+function showMegaHint() {
+    const iMax = Math.max(gMegaHintLocations[0].i, gMegaHintLocations[1].i)
+    const jMax = Math.max(gMegaHintLocations[0].j, gMegaHintLocations[1].j)
+
+    const iMin = Math.min(gMegaHintLocations[0].i, gMegaHintLocations[1].i)
+    const jMin = Math.min(gMegaHintLocations[0].j, gMegaHintLocations[1].j)
+
+    for (var i = iMin; i <= iMax; i++) {
+        for (var j = jMin; j <= jMax; j++) {
+            revealCell({ i, j }, 2000)
+        }
+    }
+    const elImg = document.querySelector('.mega-hint')
+    elImg.classList.add('used')
+    gIsMegaHint = false
+}
